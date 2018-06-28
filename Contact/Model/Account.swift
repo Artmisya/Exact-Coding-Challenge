@@ -9,7 +9,7 @@
 import Foundation
 
 
-class Contact:Codable {
+class Account:Codable {
     
     let account:String
     var businessEmail:[Value]
