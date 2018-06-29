@@ -11,13 +11,13 @@ import Foundation
 
 class Value:Codable{
     
-    let data:String?
+    let data:String
     var selected:Bool
     
-    init(data:String?) {
+    init(data:String) {
         
         self.data=data
-        selected=false
+        selected=true
     }
     
 }
