@@ -27,7 +27,6 @@ class Account:Decodable {
     var phone=[Value]()
     var pictureThumbnailUrl=[Value]()
     
-    private var incomplete:Bool=false
     private var mismatched:Bool=false
     
     private enum CodingKeys: String, CodingKey {
@@ -149,7 +148,7 @@ class Account:Decodable {
     /* this fuction merge two similar account objects into one.
         (two account objects consider similar if their accountId field have same value)
      */
-    func merge(account:Account){
+    func merge(_ account:Account){
         
         if account.businessEmail.count > 0 , self.businessEmail.contains(where:{$0.data == account.businessEmail[0].data})==false{
             
@@ -312,7 +311,13 @@ class Account:Decodable {
 
     func isIncomplete()->Bool{
 
-        return self.incomplete
+        //First name, Last name, Picture, Phone and Email
+        if (firstName.count==0 || lastName.count==0 || phone.count==0 || email.count==0 || pictureThumbnailUrl.count==0){
+            
+            return true
+        }
+        
+        return false
     }
     
 }
