@@ -48,7 +48,6 @@ class Account:Decodable {
         case phone = "Phone"
         case pictureThumbnailUrl = "PictureThumbnailUrl"
     }
-    
 
     required init(from decoder: Decoder) throws {
         
@@ -119,34 +118,13 @@ class Account:Decodable {
         }
     }
 
-//    init(account:String,businessEmail:[Value],businessPhone:[Value],
-//         businessMobile:[Value],email:[Value],firstName:[Value],
-//         fullName:[Value],gender:[Value],id:[Value],
-//         jobTitleDescription:[Value],lastName:[Value],
-//         middleName:[Value],mobile:[Value],notes:[Value],
-//         phone:[Value],pictureThumbnailUrl:[Value]){
-//
-//        self.account=account
-//        self.businessEmail=businessEmail
-//        self.businessPhone=businessPhone
-//        self.businessMobile=businessMobile
-//        self.email=email
-//        self.firstName=firstName
-//        self.fullName=fullName
-//        self.gender=gender
-//        self.id=id
-//        self.jobTitleDescription=jobTitleDescription
-//        self.lastName=lastName
-//        self.middleName=middleName
-//        self.mobile=mobile
-//        self.notes=notes
-//        self.phone=phone
-//        self.pictureThumbnailUrl=pictureThumbnailUrl
-//
-//    }
+    init(accountId:String) {
+        
+        self.accountId=accountId
+    }
     
-    /* this fuction merge two similar account objects into one.
-        (two account objects consider similar if their accountId field have same value)
+    /* this fuction merge the current account with a similar account object.
+    (two account objects consider similar if their accountId field have a same value)
      */
     func merge(_ account:Account){
         
@@ -156,9 +134,7 @@ class Account:Decodable {
             
             // set selected to false , let user decide which value is correct
             account.businessEmail[0].selected=false
-            self.businessEmail[0].selected=false
             self.mismatched=true
-            
         }
         if account.businessPhone.count > 0 , self.businessPhone.contains(where:{$0.data == account.businessPhone[0].data})==false{
             
@@ -166,9 +142,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.businessPhone[0].selected=false
-            self.businessPhone[0].selected=false
             self.mismatched=true
-            
         }
         if account.businessPhone.count > 0 ,self.businessMobile.contains(where:{$0.data == account.businessMobile[0].data})==false{
             
@@ -176,9 +150,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.businessMobile[0].selected=false
-            self.businessMobile[0].selected=false
             self.mismatched=true
-            
         }
         if account.email.count > 0 ,self.email.contains(where:{$0.data == account.email[0].data})==false{
             
@@ -186,9 +158,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.email[0].selected=false
-            self.email[0].selected=false
             self.mismatched=true
-            
         }
         if account.firstName.count > 0 ,self.firstName.contains(where:{$0.data == account.firstName[0].data})==false{
             
@@ -196,9 +166,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.firstName[0].selected=false
-            self.firstName[0].selected=false
             self.mismatched=true
-            
         }
         if account.fullName.count > 0 ,self.fullName.contains(where:{$0.data == account.fullName[0].data})==false{
             
@@ -206,9 +174,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.fullName[0].selected=false
-            self.fullName[0].selected=false
             self.mismatched=true
-            
         }
         if account.gender.count > 0 ,self.gender.contains(where:{$0.data == account.gender[0].data})==false{
             
@@ -216,9 +182,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.gender[0].selected=false
-            self.gender[0].selected=false
             self.mismatched=true
-            
         }
         if account.id.count > 0 ,self.id.contains(where:{$0.data == account.id[0].data})==false{
             
@@ -226,9 +190,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.id[0].selected=false
-            self.id[0].selected=false
             self.mismatched=true
-            
         }
         if account.jobTitleDescription.count > 0 , self.jobTitleDescription.contains(where:{$0.data == account.jobTitleDescription[0].data})==false{
             
@@ -236,9 +198,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.jobTitleDescription[0].selected=false
-            self.jobTitleDescription[0].selected=false
             self.mismatched=true
-            
         }
         if account.lastName.count > 0 ,self.lastName.contains(where:{$0.data == account.lastName[0].data})==false{
             
@@ -246,9 +206,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.lastName[0].selected=false
-            self.lastName[0].selected=false
             self.mismatched=true
-            
         }
         if account.middleName.count > 0 ,self.middleName.contains(where:{$0.data == account.middleName[0].data})==false{
             
@@ -256,9 +214,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.middleName[0].selected=false
-            self.middleName[0].selected=false
             self.mismatched=true
-            
         }
         if account.mobile.count > 0 ,self.mobile.contains(where:{$0.data == account.mobile[0].data})==false{
             
@@ -266,9 +222,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.mobile[0].selected=false
-            self.mobile[0].selected=false
             self.mismatched=true
-            
         }
         if account.notes.count > 0 ,self.notes.contains(where:{$0.data == account.notes[0].data})==false{
             
@@ -276,9 +230,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.notes[0].selected=false
-            self.notes[0].selected=false
             self.mismatched=true
-            
         }
         if account.phone.count > 0 ,self.phone.contains(where:{$0.data == account.phone[0].data})==false{
             
@@ -286,9 +238,7 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.phone[0].selected=false
-            self.phone[0].selected=false
             self.mismatched=true
-            
         }
         
         if account.pictureThumbnailUrl.count > 0 ,self.pictureThumbnailUrl.contains(where:{$0.data == account.pictureThumbnailUrl[0].data})==false{
@@ -297,30 +247,84 @@ class Account:Decodable {
             
              // set selected to false , let user decide which value is correct
             account.pictureThumbnailUrl[0].selected=false
-            self.pictureThumbnailUrl[0].selected=false
             self.mismatched=true
+        }
+    }
+    
+    func save() -> Result<Bool> {
+        
+        if (self.isIncomplete()){
             
+            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.accountCompulsoryFields])
+            let result=Result<Bool>.failure(error)
+            return result
         }
         
+        // remove unselected values
+        businessEmail=removeUnselectedValues(businessEmail)
+        businessPhone=removeUnselectedValues(businessPhone)
+        businessMobile=removeUnselectedValues(businessMobile)
+        email=removeUnselectedValues(email)
+        firstName=removeUnselectedValues(firstName)
+        fullName=removeUnselectedValues(fullName)
+        gender=removeUnselectedValues(gender)
+        id=removeUnselectedValues(id)
+        jobTitleDescription=removeUnselectedValues(jobTitleDescription)
+        lastName=removeUnselectedValues(lastName)
+        middleName=removeUnselectedValues(middleName)
+        mobile=removeUnselectedValues(mobile)
+        notes=removeUnselectedValues(notes)
+        phone=removeUnselectedValues(phone)
+        pictureThumbnailUrl=removeUnselectedValues(pictureThumbnailUrl)
+        
+        let result=Result.success(true)
+        return result
     }
     
     func isMismatched()->Bool{
-
         return self.mismatched
     }
-
+    
     func isIncomplete()->Bool{
-
+        
         //First name, Last name, Picture, Phone and Email
-        if (firstName.count==0 || lastName.count==0 || phone.count==0 || email.count==0 || pictureThumbnailUrl.count==0){
+        if (isArrayEmpty(firstName) || isArrayEmpty(lastName) || isArrayEmpty(phone) || isArrayEmpty(email) || isArrayEmpty(pictureThumbnailUrl)){
             
             return true
         }
-        
         return false
     }
     
+ // MARK:- private functions
+    private func isArrayEmpty(_ inputArray:[Value])->Bool{
+        
+        if inputArray.contains(where:{$0.selected == true}){
+            // has one  value with selected==true
+            return false
+        }
+        // either the array is empty or has no value with selected==true
+        return true
+    }
+    
+    private func removeUnselectedValues(_ inputArray:[Value])-> [Value]{
+        
+        return inputArray.filter({ $0.selected == false })
+    }
 }
 
 
-
+// MARK:- Expose Account private functions for unit test
+#if DEBUG
+extension Account {
+    
+    public func exposePrivateIsArrayEmpty(_ inputArray:[Value])->Bool {
+        return self.isArrayEmpty(inputArray)
+    }
+    
+    public func exposePrivateRemoveUnselectedValues(_ inputArray:[Value])-> [Value] {
+        return self.removeUnselectedValues(inputArray)
+    }
+    
+    
+}
+#endif
