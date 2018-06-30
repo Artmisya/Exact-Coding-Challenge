@@ -31,102 +31,50 @@ final class CompanyContact{
 
             switch result{
 
+            case .success(let data):
+                let resultCreateContactList=self.createContactsListFromData(data:data)
+                switch resultCreateContactList {
                 case .success(let data):
-
-                    self.createContactsListFromData(data:data)
+                    // init the self.contactsList
+                    self.contactsList=data
                     let result=Result.success(self.contactsList)
                     complationHandler(result)
-
+                
                 case .failure(let error):
                     let result=Result<[Account]>.failure(error)
                     complationHandler(result)
-            }
-        }
-        
-        // create [Account] from Data received from API
-       /* let resultCreateContactList=self.createContactsListFromData()
-        switch resultCreateContactList {
-            
-            case .success(let data):
-                // init the self.contactsList
-                self.contactsList=data 
-                let result=Result.success(self.contactsList)
-                complationHandler(result)
-            
+                }
             case .failure(let error):
                 let result=Result<[Account]>.failure(error)
                 complationHandler(result)
-        }*/
-      
-    }
-    
-//    private func createContactsListFromData()->Result<[Account]>{
-//
-//            // first: decode Data into [Account]
-//            let decodeResult=self.decodeContactsData()
-//            switch decodeResult{
-//
-//                case .success(let data):
-//                    let decodedContactsList = data
-//                        // second: merge similar accounts into one account
-//                        let mergedAccountsList=self.mergeSimilarAccounts(decodedContactsList)
-//                        let result=Result.success(mergedAccountsList)
-//                        return result
-//
-//                case .failure(let error):
-//                    let result=Result<[Account]>.failure(error)
-//                    return result
-//            }
-//    }
-    private func createContactsListFromData(data:[String:Any])->Result<[Account]>{
-        
-        if let d=data["d"]  as? [String: Any]{
-
-            if let results=d["results"] as?  [NSDictionary]{
-                
-                let jsonDecoder = JSONDecoder()
-                
-                do {
-                    
-                    let resultsData=try JSONSerialization.data(withJSONObject: results, options: JSONSerialization.WritingOptions.prettyPrinted) as NSData
-                    let decodedContactsList=try jsonDecoder.decode([Account].self, from: resultsData as Data)
-                    
-                    print ("******",contactsList[0].notes[0].data)
-                } catch let error {
-                    
-                    let result=Result<[Account]>.failure(error)
-                    return result
-                }
-
-//                let resultsData: Data = NSKeyedArchiver.archivedData(withRootObject: results[1]) as Data
-//                let dictionary = NSKeyedUnarchiver.unarchiveObject(with: resultsData as Data) as? NSDictionary
-//
-//                let jsonDecoder = JSONDecoder()
-//
-//                do{
-//
-//                  //  resultsData=resultsData.removeLast()
-//                   // String(data: bytes, encoding: .utf8)
-//                    let jsonString=String(decoding: resultsData, as: UTF8.self)
-//                    print("************",jsonString)
-//                    print ("jjjjjjjjjjj",resultsData,dictionary.data)
-//                    let contactsList=try jsonDecoder.decode(Account.self, from: resultsData)
-//                }
-//                catch let error{
-//
-//                    print (error)
-//                }
             }
         }
-        
-        let result=Result.success(contactsList)
-        return result
-       
+ 
     }
-    private func mergeSimilarAccounts(_ accountsList:[Account])->[Account]{
+    
+    private func createContactsListFromData(data:Data)->Result<[Account]>{
+
+            // first: decode Data into [Account]
+        let decodeResult=self.decodeContactsData(data:data)
+            switch decodeResult{
+                
+            case .success(let data):
+                let decodedAccountsList = data
+                    // second: merge similar accounts into one account
+                let mergedAccountsList=self.mergeSimilarAccounts(accountsList:decodedAccountsList)
+                    let result=Result.success(mergedAccountsList)
+                    return result
+            case .failure(let error):
+                print (error.localizedDescription)
+                let result=Result<[Account]>.failure(error)
+                return result
+            }
+    }
+
+    private func mergeSimilarAccounts(accountsList:[Account])->[Account]{
         
         var mergedAccountList=[Account]()
-        for account in mergedAccountList{
+        for account in accountsList{
             // check if it is a duplicated account
             if let index = mergedAccountList.index(where: { $0.accountId == account.accountId }) {
                 // it is a duplicated account, merge it with the similar account
@@ -140,28 +88,65 @@ final class CompanyContact{
         }
         return mergedAccountList
     }
-    
-    private func decodeContactsData()->Result<[Account]>{
+
+    private func decodeContactsData(data:Data)->Result<[Account]>{
         
-        let result = JsonHandler.readJsonFile(fileName: "contact")
-        switch(result) {
+        // convert Data to [String,Any]
+        var dataDic: [String: Any]
+        do {
+            dataDic = try JSONSerialization.jsonObject(with: data, options:.allowFragments) as! [String: Any]
+        } catch let error {
             
-            case .success(let data):
-                let jsonDecoder = JSONDecoder()
-                do{
-                    let contactsList=try jsonDecoder.decode([Account].self, from: data as! Data)
-                    let result=Result.success(contactsList)
-                    return result
-                }
-                catch let error{
-                    print (error)
-                    let result=Result<[Account]>.failure(error)
-                    return result
-                }
-            case .failure(let error):
-                print (error)
-                let result=Result<[Account]>.failure(error)
-                return result
+            print( error)
+            let result=Result<[Account]>.failure(error)
+            return result
         }
+        
+        guard let d=dataDic["d"]  as? [String: Any] else{
+            
+            let error = NSError(domain: Constants.DomainError.api, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
+            let result=Result<[Account]>.failure(error)
+            return result
+        }
+            
+        guard let results=d["results"] as?  [NSDictionary] else{
+            
+            let error = NSError(domain: Constants.DomainError.api, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
+            let result=Result<[Account]>.failure(error)
+            return result
+        }
+                
+        let jsonDecoder = JSONDecoder()
+        
+        do {
+            let resultsData=try JSONSerialization.data(withJSONObject: results, options: JSONSerialization.WritingOptions.prettyPrinted) as NSData
+            let decodedContactsList=try jsonDecoder.decode([Account].self, from: resultsData as Data)
+            //print ("******",decodedContactsList.count)
+            
+            let result=Result.success(decodedContactsList)
+            return result
+        } catch let error {
+            let result=Result<[Account]>.failure(error)
+            return result
+        }
+     }
+}
+
+// MARK:- Expose Account private functions for unit test
+#if DEBUG
+extension CompanyContact {
+    
+    public func exposePrivateDecodeContactsData(data:Data)->Result<[Account]>{
+        return self.decodeContactsData(data:data)
+    }
+    
+    public func exposePrivateMergeSimilarAccounts(accountsList:[Account])->[Account]{
+        return self.mergeSimilarAccounts(accountsList:accountsList)
+    }
+    
+    public func exposePrivateCreateContactsListFromData(data:Data)->Result<[Account]>{
+        return self.createContactsListFromData(data:data)
     }
 }
+#endif
+
