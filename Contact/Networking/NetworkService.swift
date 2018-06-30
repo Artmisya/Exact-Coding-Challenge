@@ -45,7 +45,6 @@ class NetworkService{
                 // inform  model layer about the error
                 let result=Result<Data>.failure(error)
                 complationHandler(result)
-                
                 return
             }
             //check response's status code
@@ -59,12 +58,17 @@ class NetworkService{
                 return
                 
             }
-            if let data = data {
+            guard let data = data else{
                 
-                let result=Result.success(data)
+                let error = NSError(domain: Constants.DomainError.server, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
+                // inform  model layer about the error
+                let result=Result<Data>.failure(error)
                 complationHandler(result)
+                return
             }
-            
+            // data is received from api successfully
+            let result=Result.success(data)
+            complationHandler(result)
         }
         dataTask.resume()
     }
