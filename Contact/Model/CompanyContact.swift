@@ -7,13 +7,10 @@
 //
 
 import Foundation
-
-
 final class CompanyContact{
     
     static let sharedInstance=CompanyContact()
     private init() {}
-    
     private(set) var contactsList=[Account]()
     
     func fetchContacts(complationHandler:@escaping (Result<[Account]>) -> Void){
@@ -26,7 +23,6 @@ final class CompanyContact{
             complationHandler(result)
             return
         }
-        
         NetworkService.request(url: url) { (result) in
 
             switch result{
@@ -51,9 +47,7 @@ final class CompanyContact{
         }
  
     }
-    
     private func createContactsListFromData(data:Data)->Result<[Account]>{
-
             // first: decode Data into [Account]
         let decodeResult=self.decodeContactsData(data:data)
             switch decodeResult{
@@ -70,7 +64,7 @@ final class CompanyContact{
                 return result
             }
     }
-
+    
     private func mergeSimilarAccounts(accountsList:[Account])->[Account]{
         
         var mergedAccountList=[Account]()
@@ -101,21 +95,18 @@ final class CompanyContact{
             let result=Result<[Account]>.failure(error)
             return result
         }
-        
         guard let d=dataDic["d"]  as? [String: Any] else{
             
             let error = NSError(domain: Constants.DomainError.api, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
             let result=Result<[Account]>.failure(error)
             return result
         }
-            
         guard let results=d["results"] as?  [NSDictionary] else{
             
             let error = NSError(domain: Constants.DomainError.api, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
             let result=Result<[Account]>.failure(error)
             return result
         }
-                
         let jsonDecoder = JSONDecoder()
         
         do {
