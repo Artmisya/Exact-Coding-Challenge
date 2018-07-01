@@ -11,34 +11,90 @@ import XCTest
 
 class ContactTests: XCTestCase {
     
-    var accountUnderTest: Account!
     var companyContactUnderTest:CompanyContact!
     
     override func setUp() {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        
-        accountUnderTest=Account(accountId: "AccountUnderTest")
         companyContactUnderTest=CompanyContact.sharedInstance
     }
     
     override func tearDown() {
 
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        accountUnderTest=nil
         companyContactUnderTest=nil
         super.tearDown()
     }
     
+//****** MARK: NetworkService  tests:
+    func testNetworkService(){
+        
+        let urlStringUnderTest="https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contacts.json?alt=media&token=431c2754-b3f9-4485-8c5d-0365d5f8f0e5"
+        let e = expectation(description: "complationHandler handler invoked")
+        let url=URL(string:urlStringUnderTest)!
+        
+        NetworkService.request(url: url) { (reply) in
+            switch reply{
+            case .success(let data):
+                XCTAssertNotNil(data, "Expected Data, received :nil")
+            case .failure(let error):
+                XCTAssert(false, "Expected Data, received :\(error)")
+            }
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 15.0, handler: nil)
+
+    }
+    
+    func testNetworkServiceWithUnreachableUrl(){
+        
+        let unreachableUrlStringUnderTest="http://doesNotExsiturl.org"
+        let e = expectation(description: "complationHandler handler invoked")
+        let url=URL(string:unreachableUrlStringUnderTest)!
+        
+        NetworkService.request(url: url) { (reply) in
+            switch reply{
+            case .success(let data):
+                 XCTAssert(false, "Expected error, received :\(data)")
+            case .failure(let error):
+                XCTAssertNotNil(error, "Expected error, received :nil")
+            }
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 15.0, handler: nil)
+        
+    }
+    
+    /**turn OFF your internet connection to perform this test**/
+    func testNetworkServiceWithNoInternetConnection(){
+        
+        let notChachedUrlStrinUnderTest="http://musicbrainz.org/ws/2/place/?query=notCached&limit=20&offset=0&fmt=json"
+        let e = expectation(description: "complationHandler handler invoked")
+        let url=URL(string:notChachedUrlStrinUnderTest)!
+        
+        NetworkService.request(url: url) { (reply) in
+            switch reply{
+            case .success(let data):
+                XCTAssert(false, "Expected error, received :\(data)")
+            case .failure(let error):
+                XCTAssertNotNil(error, "Expected error, received :nil")
+            }
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 30.0, handler: nil)
+        
+    }
+//****** MARK: Account Class tests:
     func testAccountIsArrayEmpty(){
         
+        let accountUnderTest=Account(accountId: "AccountUnderTest")
         //1. test with an empty array
         let emptyArr=[Value]()
         let result=accountUnderTest.exposePrivateIsArrayEmpty(emptyArr)
         XCTAssertTrue(result, "Expected true, received:\(result)")
         
-        //2. test with none empty array that has no selected value
+        //2. test with a none empty array that has no selected value
         let unselectedValue=Value(data:"test")
         unselectedValue.selected=false
         
@@ -48,7 +104,7 @@ class ContactTests: XCTestCase {
         let resultNoneEmptyArr=accountUnderTest.exposePrivateIsArrayEmpty(noneEmptyArr)
         XCTAssertTrue(resultNoneEmptyArr, "Expected true, received:\(resultNoneEmptyArr)")
         
-        //3. test with none empty array that has a selected value
+        //3. test with a none empty array that has a selected value
         let selectedValue=Value(data:"test")
         selectedValue.selected=true
         
@@ -67,7 +123,7 @@ class ContactTests: XCTestCase {
         let resultIncompAcc=incompleteAcc.isIncomplete()
         XCTAssertTrue(resultIncompAcc, "Expected true, received:\(resultIncompAcc)")
 
-        //2. test with an complete account
+        //2. test with a complete account
         let completeAcc=Account(accountId: "completeAccount")
             // create a selected value
         let selectedValue=Value(data:"test")
@@ -131,9 +187,8 @@ class ContactTests: XCTestCase {
         XCTAssertEqual(originalAcc.pictureThumbnailUrl.count,1, "Expected 1, received:\(originalAcc.pictureThumbnailUrl.count)")
         
         //2. test merge with a none empty account whitch has same values with original account
-        
+
         let similatValue=Value(data:"originalValue")
-        
             // fill up the similar account with with similar of values
         similarAccWithSameValues.businessEmail.append(similatValue)
         similarAccWithSameValues.businessPhone.append(similatValue)
@@ -175,9 +230,7 @@ class ContactTests: XCTestCase {
         
             // create of different value
         let diffValue=Value(data:"newValue")
- 
             // fill up the similar account with different of values
-        
         similarAccWithDiffValues.businessEmail.append(diffValue)
         similarAccWithDiffValues.businessPhone.append(diffValue)
         similarAccWithDiffValues.businessMobile.append(diffValue)
@@ -272,7 +325,7 @@ class ContactTests: XCTestCase {
         completeAcc.phone.append(unselectedValue)
         completeAcc.pictureThumbnailUrl.append(unselectedValue)
         
-         // confirm that before save the account contain both selected and unselected values
+        // confirm that the account contain both selected and unselected values before save getting called:
         XCTAssertEqual(completeAcc.businessEmail.count,2, "Expected 2, received:\(completeAcc.businessEmail.count)")
         XCTAssertEqual(completeAcc.businessPhone.count,2, "Expected 2, received:\(completeAcc.businessPhone.count)")
         XCTAssertEqual(completeAcc.businessMobile.count,2, "Expected 2, received:\(completeAcc.businessMobile.count)")
@@ -294,7 +347,7 @@ class ContactTests: XCTestCase {
             // save should be success
         XCTAssert(try resultCompleteAcc.assertIsSuccess())
         
-            // after save all unselected values shoule be removed
+        //confirm that the save function has removed all unselected values:
         XCTAssertEqual(completeAcc.businessEmail.count,1, "Expected 1, received:\(completeAcc.businessEmail.count)")
         XCTAssertEqual(completeAcc.businessPhone.count,1, "Expected 1, received:\(completeAcc.businessPhone.count)")
         XCTAssertEqual(completeAcc.businessMobile.count,1, "Expected 1, received:\(completeAcc.businessMobile.count)")
@@ -366,10 +419,177 @@ class ContactTests: XCTestCase {
         }
     }
     
+//****** MARK: CompanyContact Class tests:
+    
+    func testCompanyContactDecodeContactsFromData(){
+        
+        //1. test it with a valid json (in a format that we expect to get from api)
+        let jsonString="{\"d\": {\"results\": [{\"Account\": \"accountUnderTest\",\"BusinessEmail\": \"maul.mm@mail.com\",\"BusinessPhone\": \"+60123456789\",\"BusinessMobile\": null,\"Email\": \"personalmaul.mm@mail.com\", \"FirstName\": \"Anton\",\"FullName\": \"Anton De Boer\",\"Gender\": \"M\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a9\",\"JobTitleDescription\": \"Controller\",\"LastName\": \"Boer\",\"MiddleName\": \"De\",\"Mobile\": \"+60123456779\", \"Notes\": \"new notes\",\"Phone\": \"+60123456799\",\"PictureThumbnailUrl\": null},{\"Account\": \"accountUnderTest2\",\"BusinessEmail\": \"maul.mm2@mail.com\",\"BusinessPhone\": \"+60123456782\",\"BusinessMobile\": \"0123456793\",\"Email\": \"personalmaul.mm2@mail.com\", \"FirstName\": \"Anton2\",\"FullName\": \"Anton De Boer2\",\"Gender\": \"F\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a92\",\"JobTitleDescription\": \"Controller2\",\"LastName\": \"Boer2\",\"MiddleName\": \"De2\",\"Mobile\": \"+60123456772\", \"Notes\": \"new notes2\",\"Phone\": \"+60123456792\",\"PictureThumbnailUrl\": \"https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contact-thumb.png?alt=media&token=d68298eb-9879-4c9a-8319-5ef0a9eb3c57\"}]}}"
+        
+        
+        guard let data=jsonString.data(using:.utf8) else{
+            XCTAssert(false, "Expected Data, received nil")
+            return
+        }
+   
+        let resultFromValidData=companyContactUnderTest.exposePrivateDecodeContactsData(data: data)
+        // expect it to success
+        XCTAssert(try resultFromValidData.assertIsSuccess())
+        
+        switch resultFromValidData {
+            
+        case .success(let contactList):
+            XCTAssertEqual(2, contactList.count)
+            let account1=contactList[0]
+            let account2=contactList[1]
+            // check account values if they are same as jason
+            XCTAssertEqual(account1.accountId, "accountUnderTest")
+            XCTAssertEqual(account1.businessEmail[0].data, "maul.mm@mail.com")
+            XCTAssertEqual(account1.businessPhone[0].data, "+60123456789")
+            XCTAssertEqual(account1.email[0].data, "personalmaul.mm@mail.com")
+            XCTAssertEqual(account1.firstName[0].data, "Anton")
+            XCTAssertEqual(account1.fullName[0].data, "Anton De Boer")
+            XCTAssertEqual(account1.gender[0].data, "M")
+            XCTAssertEqual(account1.id[0].data, "1415c43e-00d5-4640-aada-0759c297b3a9")
+            XCTAssertEqual(account1.jobTitleDescription[0].data, "Controller")
+            XCTAssertEqual(account1.lastName[0].data, "Boer")
+            XCTAssertEqual(account1.middleName[0].data, "De")
+            XCTAssertEqual(account1.mobile[0].data, "+60123456779")
+            XCTAssertEqual(account1.notes[0].data, "new notes")
+            XCTAssertEqual(account1.phone[0].data, "+60123456799")
+            
+            XCTAssertEqual(account2.accountId, "accountUnderTest2")
+            XCTAssertEqual(account2.businessEmail[0].data, "maul.mm2@mail.com")
+            XCTAssertEqual(account2.businessPhone[0].data, "+60123456782")
+            XCTAssertEqual(account2.businessMobile[0].data, "0123456793")
+            XCTAssertEqual(account2.email[0].data, "personalmaul.mm2@mail.com")
+            XCTAssertEqual(account2.firstName[0].data, "Anton2")
+            XCTAssertEqual(account2.fullName[0].data, "Anton De Boer2")
+            XCTAssertEqual(account2.gender[0].data, "F")
+            XCTAssertEqual(account2.id[0].data, "1415c43e-00d5-4640-aada-0759c297b3a92")
+            XCTAssertEqual(account2.jobTitleDescription[0].data, "Controller2")
+            XCTAssertEqual(account2.lastName[0].data, "Boer2")
+            XCTAssertEqual(account2.middleName[0].data, "De2")
+            XCTAssertEqual(account2.mobile[0].data, "+60123456772")
+            XCTAssertEqual(account2.notes[0].data, "new notes2")
+            XCTAssertEqual(account2.phone[0].data, "+60123456792")
+            XCTAssertEqual(account2.pictureThumbnailUrl[0].data, "https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contact-thumb.png?alt=media&token=d68298eb-9879-4c9a-8319-5ef0a9eb3c57")
+            
+        case .failure(let error):
+            XCTAssert(false, "Expected [Account], received :\(error)")
+        }
+    
+        //2. test  with a not valid json (d is missing from the input json), this will covert emty string as well
+        let wrongJsonString="{\"results\": [{\"Account\": \"accountUnderTest\",\"BusinessEmail\": \"maul.mm@mail.com\",\"BusinessPhone\": \"+60123456789\",\"BusinessMobile\": null,\"Email\": \"personalmaul.mm@mail.com\", \"FirstName\": \"Anton\",\"FullName\": \"Anton De Boer\",\"Gender\": \"M\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a9\",\"JobTitleDescription\": \"Controller\",\"LastName\": \"Boer\",\"MiddleName\": \"De\",\"Mobile\": \"+60123456779\", \"Notes\": \"new notes\",\"Phone\": \"+60123456799\",\"PictureThumbnailUrl\": null},{\"Account\": \"accountUnderTest2\",\"BusinessEmail\": \"maul.mm2@mail.com\",\"BusinessPhone\": \"+60123456782\",\"BusinessMobile\": \"0123456793\",\"Email\": \"personalmaul.mm2@mail.com\", \"FirstName\": \"Anton2\",\"FullName\": \"Anton De Boer2\",\"Gender\": \"F\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a92\",\"JobTitleDescription\": \"Controller2\",\"LastName\": \"Boer2\",\"MiddleName\": \"De2\",\"Mobile\": \"+60123456772\", \"Notes\": \"new notes2\",\"Phone\": \"+60123456792\",\"PictureThumbnailUrl\": \"https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contact-thumb.png?alt=media&token=d68298eb-9879-4c9a-8319-5ef0a9eb3c57\"}]}"
+        
+        guard let wrongData=wrongJsonString.data(using:.utf8) else{
+            XCTAssert(false, "Expected Data, received nil")
+            return
+        }
+        let resultFromNotValidData=companyContactUnderTest.exposePrivateDecodeContactsData(data: wrongData)
+        // expect it to fail
+        XCTAssert(try resultFromNotValidData.assertIsFailure())
+        
+        switch resultFromNotValidData {
+            
+        case .success(let contactList):
+            XCTAssert(false, "Expected error, received :\(contactList)")
+        case .failure(let error):
+            XCTAssertNotNil(error,"Expected error, received :nil")
+          
+        }
+        
+        //3. test when the results array receiving from api is empty
+        
+        let emptyResultjsonString="{\"d\": {\"results\": []}}"
+        guard let emptyResultData=emptyResultjsonString.data(using:.utf8) else{
+            XCTAssert(false, "Expected Data, received nil")
+            return
+        }
+        
+        let resultFromEmptyResult=companyContactUnderTest.exposePrivateDecodeContactsData(data: emptyResultData)
+        // expect it to success with an empty array
+        XCTAssert(try resultFromEmptyResult.assertIsSuccess())
+        
+        switch resultFromEmptyResult {
+            
+        case .success(let contactList):
+            XCTAssertEqual(contactList.count, 0,"Expected 0, received :\(contactList.count)")
+        case .failure(let error):
+              XCTAssert(false, "Expected [Account], received :\(error)")
+        }
+        
+    }
 
+    func testCompanyContactMergeSimilarAccounts(){
+
+        let account=Account(accountId: "similarAccount")
+        let similarAccount=Account(accountId: "similarAccount")
+        let differentAccount=Account(accountId: "differentAccount")
+        
+        // 1. test with an empty list
+        let emptyList=[Account]()
+        let mergedEmptyList=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList:emptyList)
+
+        XCTAssertEqual(mergedEmptyList.count, 0,"Expected 0, received :\(mergedEmptyList.count)")
+
+         // 2. test when the original list does not contain any similar account objects
+        var listWithNoSimilarAccount=[Account]()
+            // fill the array with two different account
+        listWithNoSimilarAccount.append(account)
+        listWithNoSimilarAccount.append(differentAccount)
+        
+        let mergedListWithNoSimilarAcc=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList: listWithNoSimilarAccount)
+        XCTAssertEqual(mergedListWithNoSimilarAcc.count, 2,"Expected 2, received :\(mergedListWithNoSimilarAcc.count)")
+        
+        // 3. test when the original list contains  similar account objects
+        var listWithSimilarAccount=[Account]()
+        // fill the array with same account objects
+        listWithSimilarAccount.append(account)
+        listWithSimilarAccount.append(similarAccount)
+        
+        let mergedListWithSimilarAccount=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList:listWithSimilarAccount)
+        XCTAssertEqual(mergedListWithSimilarAccount.count, 1,"Expected 1, received :\(mergedListWithSimilarAccount.count)")
+
+    }
+    /**turn ON your internet connection to perform this test**/
+    func testCompanyContactFetchContacts(){
+        
+        let e = expectation(description: "complationHandler handler invoked")
+        companyContactUnderTest.fetchContacts() { (reply) in
+            
+            switch reply{
+            case .success(let data):
+                let accountListSize=data.count
+                XCTAssertTrue(accountListSize>0,"Expected an [Account] with a size > 0, received [Account] with size:\(accountListSize)")
+            case .failure(let error):
+                XCTAssert(false, "Expected [Account], received :\(error)")
+            }
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 30.0, handler: nil)
+        
+    }
+    
+    /**turn OFF your internet connection to perform this test**/
+    func testCompanyContactFetchContactsWithNoInternet(){
+        
+        let e = expectation(description: "complationHandler handler invoked")
+        companyContactUnderTest.fetchContacts() { (reply) in
+            
+            switch reply{
+            case .success(let data):
+                XCTAssert(false, "Expected error, received :\(data)")
+            case .failure(let error):
+                XCTAssertNotNil(error, "Expected error, received :nil")
+            }
+            e.fulfill()
+        }
+        waitForExpectations(timeout: 30.0, handler: nil)
+    }
 }
 
-// MARK: Helpers
+//****** MARK: Helpers
 private extension Result {
     
     func assertIsSuccess() throws -> Bool {
@@ -377,14 +597,15 @@ private extension Result {
         case .success(_):
             return true
         case .failure(_):
-            
-            throw ErrorType.generalError(message: "Expected .success, received :\(self)")
+            let error = NSError(domain: "Result", code: 0, userInfo: [NSLocalizedDescriptionKey :"Expected .success, received :\(self)"])
+            throw error
         }
     }
     func assertIsFailure() throws -> Bool {
         switch self {
         case .success(_):
-            throw ErrorType.generalError(message: "Expected .failure, received :\(self)")
+            let error = NSError(domain: "Result", code: 0, userInfo: [NSLocalizedDescriptionKey :"Expected .failure, received :\(self)"])
+            throw error
         case .failure(_):
             return true
         }
