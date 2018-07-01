@@ -11,11 +11,11 @@ final class CompanyContact{
     
     static let sharedInstance=CompanyContact()
     private init() {}
-    private(set) var contactsList=[Account]()
+    private(set) var accountsList=[Account]()
     
-    func fetchContacts(complationHandler:@escaping (Result<[Account]>) -> Void){
+    func fetchAccounts(complationHandler:@escaping (Result<[Account]>) -> Void){
         
-        guard let url=URL(string: Constants.ApiUrl.getContacts) else {
+        guard let url=URL(string: Constants.ApiUrl.getAccounts) else {
             
             let error=NSError(domain: Constants.DomainError.http, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.badUrl])
             
@@ -28,12 +28,12 @@ final class CompanyContact{
             switch result{
 
             case .success(let data):
-                let resultCreateContactList=self.createContactsListFromData(data:data)
-                switch resultCreateContactList {
+                let resultCreateAccountList=self.createAccountsListFromData(data:data)
+                switch resultCreateAccountList {
                 case .success(let data):
-                    // init the self.contactsList
-                    self.contactsList=data
-                    let result=Result.success(self.contactsList)
+                    // init the self.accountsList
+                    self.accountsList=data
+                    let result=Result.success(self.accountsList)
                     complationHandler(result)
                 
                 case .failure(let error):
@@ -47,9 +47,9 @@ final class CompanyContact{
         }
  
     }
-    private func createContactsListFromData(data:Data)->Result<[Account]>{
+    private func createAccountsListFromData(data:Data)->Result<[Account]>{
             // first: decode Data into [Account]
-        let decodeResult=self.decodeContactsData(data:data)
+        let decodeResult=self.decodeAccountsData(data:data)
             switch decodeResult{
                 
             case .success(let data):
@@ -83,7 +83,7 @@ final class CompanyContact{
         return mergedAccountList
     }
 
-    private func decodeContactsData(data:Data)->Result<[Account]>{
+    private func decodeAccountsData(data:Data)->Result<[Account]>{
         
         // convert Data to [String,Any]
         var dataDic: [String: Any]
@@ -111,10 +111,10 @@ final class CompanyContact{
         
         do {
             let resultsData=try JSONSerialization.data(withJSONObject: results, options: JSONSerialization.WritingOptions.prettyPrinted) as NSData
-            let decodedContactsList=try jsonDecoder.decode([Account].self, from: resultsData as Data)
+            let decodedAccountsList=try jsonDecoder.decode([Account].self, from: resultsData as Data)
             //print ("******",decodedContactsList.count)
             
-            let result=Result.success(decodedContactsList)
+            let result=Result.success(decodedAccountsList)
             return result
         } catch let error {
             let result=Result<[Account]>.failure(error)
@@ -127,16 +127,16 @@ final class CompanyContact{
 #if DEBUG
 extension CompanyContact {
     
-    public func exposePrivateDecodeContactsData(data:Data)->Result<[Account]>{
-        return self.decodeContactsData(data:data)
+    public func exposePrivateDecodeAccountsData(data:Data)->Result<[Account]>{
+        return self.decodeAccountsData(data:data)
     }
     
     public func exposePrivateMergeSimilarAccounts(accountsList:[Account])->[Account]{
         return self.mergeSimilarAccounts(accountsList:accountsList)
     }
     
-    public func exposePrivateCreateContactsListFromData(data:Data)->Result<[Account]>{
-        return self.createContactsListFromData(data:data)
+    public func exposePrivateCreateAccountsListFromData(data:Data)->Result<[Account]>{
+        return self.createAccountsListFromData(data:data)
     }
 }
 #endif
