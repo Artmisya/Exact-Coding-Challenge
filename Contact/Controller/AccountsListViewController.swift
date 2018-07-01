@@ -8,12 +8,35 @@
 
 import UIKit
 
-class ContactListViewController: UIViewController {
+class AccountListViewController: UIViewController {
 
+    let companyContact = CompanyContact.sharedInstance
+    var contactList=[Account]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        companyContact.fetchContacts(){ (result) in
+            
+            switch result{
+                
+            case .success(let data):
+                print("*******",data)
+                
+                 for account in data{
+                    
+                    print(account.accountId)
+                }
+                
+            case .failure(let error):
+                
+                print ("&&&&&&&",error)
+               
+            }
+            
+        }
     }
 
     override func didReceiveMemoryWarning() {
