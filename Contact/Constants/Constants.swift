@@ -7,11 +7,12 @@
 //
 
 import Foundation
+import UIKit
 
 struct Constants {
     
     struct ApiUrl{
-        static let getContacts:String="https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contacts.json?alt=media&token=431c2754-b3f9-4485-8c5d-0365d5f8f0e5"
+        static let getAccounts:String="https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contacts.json?alt=media&token=431c2754-b3f9-4485-8c5d-0365d5f8f0e5"
     }
 
     struct ErrorMessage{
@@ -30,4 +31,31 @@ struct Constants {
         static let account:String="accountError"
         static let api:String="apiError"
     }
+    
+    
+    struct Account {
+        
+        struct ColorIndicator{
+            
+            static let mismatch:UIColor = UIColor(red: 255.0/255, green: 206.0/255, blue: 91.0/255, alpha: 1.0)
+            static let incomplete:UIColor = UIColor(red: 255.0/255, green: 38.0/255, blue: 0.0/255, alpha: 1.0)
+            static let selectedValue:UIColor = UIColor(red: 143/255.0, green: 188.0/255.0, blue: 143.0/255.0, alpha: 1.0)
+            static let unselectedValue:UIColor = UIColor.white
+            static let compulsoryKey:UIColor = UIColor.red
+        }
+        
+        struct Message {
+            
+            static let saveAccountSuccess="Saved Successfully!"
+            static let deleteAccountSuccess="Removed Successfully!"
+        }
+        
+        struct Keys{
+            
+            static let KeyNames = ["businessEmail","businessPhone","businessMobile","email","firstName","middleName","lastName","fullName","gender","id","jobTitleDescription","mobile","phone","notes","pictureThumbnailUrl"]
+            
+            static let ImageType="pictureThumbnailUrl"
+        }
+    }
+    
 }
