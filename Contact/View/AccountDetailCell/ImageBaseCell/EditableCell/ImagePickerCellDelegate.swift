@@ -9,7 +9,7 @@
 import Foundation
 
 
-protocol ImagePickerDelegate {
+protocol ImagePickerDelegate:class{
     
     func pickImage(cell: EditableImageCell)
 }

@@ -15,7 +15,7 @@ class EditableImageCell: UITableViewCell {
 
     @IBOutlet var valueImage: UIImageView!
     
-    var delegate: ImagePickerDelegate! = nil
+    weak var delegate: ImagePickerDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -30,6 +30,6 @@ class EditableImageCell: UITableViewCell {
     
     @IBAction func selectImageClicked(_ sender: Any) {
         
-        delegate.pickImage(cell: self)
+        delegate?.pickImage(cell: self)
     }
 }
