@@ -11,9 +11,9 @@ import UIKit
 class ImageCell: UITableViewCell {
 
     @IBOutlet var holderView: UIView!
-    @IBOutlet var selectImageBtn: UIButton!
     @IBOutlet var selectImageView: UIImageView!
     @IBOutlet var valueImage: UIImageView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -25,4 +25,5 @@ class ImageCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+
 }
