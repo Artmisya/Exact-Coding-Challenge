@@ -7,9 +7,9 @@
 //
 
 import Foundation
-final class CompanyContact{
+final class DataRecord{
     
-    static let sharedInstance=CompanyContact()
+    static let sharedInstance=DataRecord()
     private init() {}
     private(set) var accountsList=[Account]()
     
@@ -54,7 +54,7 @@ final class CompanyContact{
                 
             case .success(let data):
                 let decodedAccountsList = data
-                    // second: merge similar accounts into one account
+                    // second: merge similar/duplicated accounts into one account
                 let mergedAccountsList=self.mergeSimilarAccounts(accountsList:decodedAccountsList)
                     let result=Result.success(mergedAccountsList)
                     return result
@@ -125,7 +125,7 @@ final class CompanyContact{
 
 // MARK:- Expose Account private functions for unit test
 #if DEBUG
-extension CompanyContact {
+extension DataRecord {
     
     public func exposePrivateDecodeAccountsData(data:Data)->Result<[Account]>{
         return self.decodeAccountsData(data:data)
