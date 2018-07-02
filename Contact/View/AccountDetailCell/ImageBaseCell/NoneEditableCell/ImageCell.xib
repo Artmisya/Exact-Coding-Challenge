@@ -76,19 +76,13 @@
                                     </mask>
                                 </variation>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iA1-Mo-2B1">
-                                <rect key="frame" x="130" y="88" width="89" height="30"/>
-                                <state key="normal" title="Select Image"/>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="7Lq-xT-vzP" secondAttribute="trailing" constant="8" id="6Bc-q9-uAd"/>
-                            <constraint firstItem="iA1-Mo-2B1" firstAttribute="leading" secondItem="rfx-JM-VN3" secondAttribute="trailing" constant="12" id="RJh-Od-hgF"/>
                             <constraint firstItem="rfx-JM-VN3" firstAttribute="top" secondItem="Pzl-Ta-t4T" secondAttribute="top" constant="13" id="SR6-d2-omq"/>
                             <constraint firstItem="rfx-JM-VN3" firstAttribute="leading" secondItem="Pzl-Ta-t4T" secondAttribute="leading" constant="18" id="VfO-ZP-vxs"/>
                             <constraint firstAttribute="bottom" secondItem="rfx-JM-VN3" secondAttribute="bottom" constant="13" id="bPY-RL-1o2"/>
-                            <constraint firstItem="iA1-Mo-2B1" firstAttribute="bottom" secondItem="rfx-JM-VN3" secondAttribute="bottom" constant="5" id="fHG-ac-b3B"/>
                             <constraint firstItem="7Lq-xT-vzP" firstAttribute="centerY" secondItem="Pzl-Ta-t4T" secondAttribute="centerY" id="kMG-mt-Ruy"/>
                         </constraints>
                     </view>
@@ -103,7 +97,6 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="holderView" destination="Pzl-Ta-t4T" id="FJb-Pe-EYR"/>
-                <outlet property="selectImageBtn" destination="iA1-Mo-2B1" id="zTf-NI-cTV"/>
                 <outlet property="selectImageView" destination="7Lq-xT-vzP" id="GbQ-sK-ff7"/>
                 <outlet property="valueImage" destination="rfx-JM-VN3" id="Tav-fs-dne"/>
             </connections>
