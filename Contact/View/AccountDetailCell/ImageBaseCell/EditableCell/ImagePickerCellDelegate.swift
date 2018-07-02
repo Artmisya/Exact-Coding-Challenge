@@ -11,5 +11,5 @@ import Foundation
 
 protocol ImagePickerDelegate {
     
-    func pickImage(cell: ImageCell)
+    func pickImage(cell: EditableImageCell)
 }
