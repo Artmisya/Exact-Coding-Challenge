@@ -13,7 +13,7 @@ import UIKit
 class EditableLabelCell: UITableViewCell,UITextFieldDelegate {
 
     @IBOutlet var inputLabel: UITextField!
-    var delegate: EditableLabelCellDelegate! = nil
+    weak var delegate: EditableLabelCellDelegate?
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -29,7 +29,7 @@ class EditableLabelCell: UITableViewCell,UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        self.delegate.textFieldDidEndEditing(cell: self, value: textField.text!)
+        self.delegate?.textFieldDidEndEditing(cell: self, value: textField.text!)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
