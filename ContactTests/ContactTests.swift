@@ -11,19 +11,19 @@ import XCTest
 
 class ContactTests: XCTestCase {
     
-    var companyContactUnderTest:CompanyContact!
+    var dataRecordUnderTest:DataRecord!
     
     override func setUp() {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        companyContactUnderTest=CompanyContact.sharedInstance
+        dataRecordUnderTest=DataRecord.sharedInstance
     }
     
     override func tearDown() {
 
         // Put teardown code here. This method is called after the invocation of each test method in the class.
-        companyContactUnderTest=nil
+        dataRecordUnderTest=nil
         super.tearDown()
     }
     
@@ -113,6 +113,41 @@ class ContactTests: XCTestCase {
         
         let resultNoneEmptyArr_2=accountUnderTest.exposePrivateIsArrayEmpty(noneEmptyArr_2)
         XCTAssertFalse(resultNoneEmptyArr_2, "Expected false, received:\(resultNoneEmptyArr_2)")
+        
+        
+        //4. test with an array that has an empty userInput
+        let userInputEmptyValue=Value(data:"")
+        userInputEmptyValue.isUserInput=true
+        
+        var emptyArr_3=[Value]()
+        emptyArr_3.append(userInputEmptyValue)
+        
+        let resultEmptyArr_3=accountUnderTest.exposePrivateIsArrayEmpty(emptyArr_3)
+        XCTAssertTrue(resultEmptyArr_3, "Expected true, received:\(resultEmptyArr_3)")
+        
+        
+        //5. test with an array that has an none empty userInput
+        let userInputValue=Value(data:"")
+        userInputValue.isUserInput=true
+        
+        var nonEmptyArr_3=[Value]()
+        userInputValue.data="something"
+        nonEmptyArr_3.append(userInputValue)
+        
+        let resultNoneEmptyArr_3=accountUnderTest.exposePrivateIsArrayEmpty(nonEmptyArr_3)
+        XCTAssertFalse(resultNoneEmptyArr_3, "Expected false, received:\(resultNoneEmptyArr_3)")
+        
+        
+        //6. test with an array that has an none empty imageData
+        let userImgInputValue=Value(data:"")
+        userImgInputValue.isUserInput=true
+        
+        var nonEmptyImgArr=[Value]()
+        userImgInputValue.imageData=Data()
+        nonEmptyImgArr.append(userImgInputValue)
+        
+        let resultNoneEmptyImgArr=accountUnderTest.exposePrivateIsArrayEmpty(nonEmptyImgArr)
+        XCTAssertFalse(resultNoneEmptyImgArr, "Expected false, received:\(resultNoneEmptyImgArr)")
  
     }
     
@@ -142,6 +177,7 @@ class ContactTests: XCTestCase {
     func testAccountMerge(){
         
         let originalAcc=Account(accountId: "account")
+        let emptyOriginalAcc=Account(accountId: "account")
         let similarAccWithSameValues=Account(accountId: "account")
         let similarAccWithDiffValues=Account(accountId: "account")
         
@@ -268,6 +304,28 @@ class ContactTests: XCTestCase {
         XCTAssertEqual(originalAcc.phone.count,2, "Expected 2, received:\(originalAcc.phone.count)")
         XCTAssertEqual(originalAcc.pictureThumbnailUrl.count,2, "Expected 2, received:\(originalAcc.pictureThumbnailUrl.count)")
         
+        // 4. test when original account is empty
+        
+        emptyOriginalAcc.merge(similarAccWithSameValues)
+        let resultNotMismatch_=originalAcc.isMismatched()
+        XCTAssertFalse(resultNotMismatch, "Expected false, received:\(resultNotMismatch_)")
+        
+        XCTAssertEqual(emptyOriginalAcc.businessEmail.count,1, "Expected 1, received:\(originalAcc.businessEmail.count)")
+        XCTAssertEqual(emptyOriginalAcc.businessPhone.count,1, "Expected 1, received:\(originalAcc.businessPhone.count)")
+        XCTAssertEqual(emptyOriginalAcc.businessMobile.count,1, "Expected 1, received:\(originalAcc.businessMobile.count)")
+        XCTAssertEqual(emptyOriginalAcc.email.count,1, "Expected 1, received:\(originalAcc.email.count)")
+        XCTAssertEqual(emptyOriginalAcc.firstName.count,1, "Expected 1, received:\(originalAcc.firstName.count)")
+        XCTAssertEqual(emptyOriginalAcc.fullName.count,1, "Expected 1, received:\(originalAcc.fullName.count)")
+        XCTAssertEqual(emptyOriginalAcc.gender.count,1, "Expected 1, received:\(originalAcc.gender.count)")
+        XCTAssertEqual(emptyOriginalAcc.id.count,1, "Expected 1, received:\(originalAcc.id.count)")
+        XCTAssertEqual(emptyOriginalAcc.jobTitleDescription.count,1, "Expected 1, received:\(originalAcc.jobTitleDescription.count)")
+        XCTAssertEqual(emptyOriginalAcc.lastName.count,1, "Expected 1, received:\(originalAcc.lastName.count)")
+        XCTAssertEqual(emptyOriginalAcc.middleName.count,1, "Expected 1, received:\(originalAcc.middleName.count)")
+        XCTAssertEqual(emptyOriginalAcc.mobile.count,1, "Expected 1, received:\(originalAcc.mobile.count)")
+        XCTAssertEqual(emptyOriginalAcc.notes.count,1, "Expected 1, received:\(originalAcc.notes.count)")
+        XCTAssertEqual(emptyOriginalAcc.phone.count,1, "Expected 1, received:\(originalAcc.phone.count)")
+        XCTAssertEqual(emptyOriginalAcc.pictureThumbnailUrl.count,1, "Expected 1, received:\(originalAcc.pictureThumbnailUrl.count)")
+        
     }
    
     func testAccountSave(){
@@ -288,14 +346,20 @@ class ContactTests: XCTestCase {
         let selectedValue=Value(data:"selectedValue")
         selectedValue.selected=true
         
+        let emailSelectedValue=Value(data:"selectedValue@gmail.com")
+        emailSelectedValue.selected=true
+        
         let unselectedValue=Value(data:"unselectedValue")
         unselectedValue.selected=false
         
+        let emailUnselectedValue=Value(data:"unselectedValue")
+        emailUnselectedValue.selected=false
+        
             // fill the account with selected values
-        completeAcc.businessEmail.append(selectedValue)
+        completeAcc.businessEmail.append(emailSelectedValue)
         completeAcc.businessPhone.append(selectedValue)
         completeAcc.businessMobile.append(selectedValue)
-        completeAcc.email.append(selectedValue)
+        completeAcc.email.append(emailSelectedValue)
         completeAcc.firstName.append(selectedValue)
         completeAcc.fullName.append(selectedValue)
         completeAcc.gender.append(selectedValue)
@@ -309,10 +373,10 @@ class ContactTests: XCTestCase {
         completeAcc.pictureThumbnailUrl.append(selectedValue)
         
         // fill the account with unselected values
-        completeAcc.businessEmail.append(unselectedValue)
+        completeAcc.businessEmail.append(emailUnselectedValue)
         completeAcc.businessPhone.append(unselectedValue)
         completeAcc.businessMobile.append(unselectedValue)
-        completeAcc.email.append(unselectedValue)
+        completeAcc.email.append(emailUnselectedValue)
         completeAcc.firstName.append(unselectedValue)
         completeAcc.fullName.append(unselectedValue)
         completeAcc.gender.append(unselectedValue)
@@ -419,9 +483,9 @@ class ContactTests: XCTestCase {
         }
     }
     
-//****** MARK: CompanyContact Class tests:
+//****** MARK: Data Class tests:
     
-    func testCompanyContactDecodeContactsFromData(){
+    func testDataRecordDecodeContactsFromData(){
         
         //1. test it with a valid json (in a format that we expect to get from api)
         let jsonString="{\"d\": {\"results\": [{\"Account\": \"accountUnderTest\",\"BusinessEmail\": \"maul.mm@mail.com\",\"BusinessPhone\": \"+60123456789\",\"BusinessMobile\": null,\"Email\": \"personalmaul.mm@mail.com\", \"FirstName\": \"Anton\",\"FullName\": \"Anton De Boer\",\"Gender\": \"M\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a9\",\"JobTitleDescription\": \"Controller\",\"LastName\": \"Boer\",\"MiddleName\": \"De\",\"Mobile\": \"+60123456779\", \"Notes\": \"new notes\",\"Phone\": \"+60123456799\",\"PictureThumbnailUrl\": null},{\"Account\": \"accountUnderTest2\",\"BusinessEmail\": \"maul.mm2@mail.com\",\"BusinessPhone\": \"+60123456782\",\"BusinessMobile\": \"0123456793\",\"Email\": \"personalmaul.mm2@mail.com\", \"FirstName\": \"Anton2\",\"FullName\": \"Anton De Boer2\",\"Gender\": \"F\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a92\",\"JobTitleDescription\": \"Controller2\",\"LastName\": \"Boer2\",\"MiddleName\": \"De2\",\"Mobile\": \"+60123456772\", \"Notes\": \"new notes2\",\"Phone\": \"+60123456792\",\"PictureThumbnailUrl\": \"https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contact-thumb.png?alt=media&token=d68298eb-9879-4c9a-8319-5ef0a9eb3c57\"}]}}"
@@ -432,7 +496,7 @@ class ContactTests: XCTestCase {
             return
         }
    
-        let resultFromValidData=companyContactUnderTest.exposePrivateDecodeContactsData(data: data)
+        let resultFromValidData=dataRecordUnderTest.exposePrivateDecodeAccountsData(data: data)
         // expect it to success
         XCTAssert(try resultFromValidData.assertIsSuccess())
         
@@ -479,14 +543,14 @@ class ContactTests: XCTestCase {
             XCTAssert(false, "Expected [Account], received :\(error)")
         }
     
-        //2. test  with a not valid json (d is missing from the input json), this will covert emty string as well
+        //2. test  with a not valid json (d is missing from the input json), this will covert an empty string as well
         let wrongJsonString="{\"results\": [{\"Account\": \"accountUnderTest\",\"BusinessEmail\": \"maul.mm@mail.com\",\"BusinessPhone\": \"+60123456789\",\"BusinessMobile\": null,\"Email\": \"personalmaul.mm@mail.com\", \"FirstName\": \"Anton\",\"FullName\": \"Anton De Boer\",\"Gender\": \"M\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a9\",\"JobTitleDescription\": \"Controller\",\"LastName\": \"Boer\",\"MiddleName\": \"De\",\"Mobile\": \"+60123456779\", \"Notes\": \"new notes\",\"Phone\": \"+60123456799\",\"PictureThumbnailUrl\": null},{\"Account\": \"accountUnderTest2\",\"BusinessEmail\": \"maul.mm2@mail.com\",\"BusinessPhone\": \"+60123456782\",\"BusinessMobile\": \"0123456793\",\"Email\": \"personalmaul.mm2@mail.com\", \"FirstName\": \"Anton2\",\"FullName\": \"Anton De Boer2\",\"Gender\": \"F\",\"ID\": \"1415c43e-00d5-4640-aada-0759c297b3a92\",\"JobTitleDescription\": \"Controller2\",\"LastName\": \"Boer2\",\"MiddleName\": \"De2\",\"Mobile\": \"+60123456772\", \"Notes\": \"new notes2\",\"Phone\": \"+60123456792\",\"PictureThumbnailUrl\": \"https://firebasestorage.googleapis.com/v0/b/contacts-8d05b.appspot.com/o/contact-thumb.png?alt=media&token=d68298eb-9879-4c9a-8319-5ef0a9eb3c57\"}]}"
         
         guard let wrongData=wrongJsonString.data(using:.utf8) else{
             XCTAssert(false, "Expected Data, received nil")
             return
         }
-        let resultFromNotValidData=companyContactUnderTest.exposePrivateDecodeContactsData(data: wrongData)
+        let resultFromNotValidData=dataRecordUnderTest.exposePrivateDecodeAccountsData(data: wrongData)
         // expect it to fail
         XCTAssert(try resultFromNotValidData.assertIsFailure())
         
@@ -507,7 +571,7 @@ class ContactTests: XCTestCase {
             return
         }
         
-        let resultFromEmptyResult=companyContactUnderTest.exposePrivateDecodeContactsData(data: emptyResultData)
+        let resultFromEmptyResult=dataRecordUnderTest.exposePrivateDecodeAccountsData(data: emptyResultData)
         // expect it to success with an empty array
         XCTAssert(try resultFromEmptyResult.assertIsSuccess())
         
@@ -521,15 +585,15 @@ class ContactTests: XCTestCase {
         
     }
 
-    func testCompanyContactMergeSimilarAccounts(){
+    func testDataRecordMergeSimilarAccounts(){
 
         let account=Account(accountId: "similarAccount")
         let similarAccount=Account(accountId: "similarAccount")
         let differentAccount=Account(accountId: "differentAccount")
         
-        // 1. test with an empty list
+        // 1. test with an empty account
         let emptyList=[Account]()
-        let mergedEmptyList=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList:emptyList)
+        let mergedEmptyList=dataRecordUnderTest.exposePrivateMergeSimilarAccounts(accountsList:emptyList)
 
         XCTAssertEqual(mergedEmptyList.count, 0,"Expected 0, received :\(mergedEmptyList.count)")
 
@@ -539,7 +603,7 @@ class ContactTests: XCTestCase {
         listWithNoSimilarAccount.append(account)
         listWithNoSimilarAccount.append(differentAccount)
         
-        let mergedListWithNoSimilarAcc=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList: listWithNoSimilarAccount)
+        let mergedListWithNoSimilarAcc=dataRecordUnderTest.exposePrivateMergeSimilarAccounts(accountsList: listWithNoSimilarAccount)
         XCTAssertEqual(mergedListWithNoSimilarAcc.count, 2,"Expected 2, received :\(mergedListWithNoSimilarAcc.count)")
         
         // 3. test when the original list contains  similar account objects
@@ -548,15 +612,15 @@ class ContactTests: XCTestCase {
         listWithSimilarAccount.append(account)
         listWithSimilarAccount.append(similarAccount)
         
-        let mergedListWithSimilarAccount=companyContactUnderTest.exposePrivateMergeSimilarAccounts(accountsList:listWithSimilarAccount)
+        let mergedListWithSimilarAccount=dataRecordUnderTest.exposePrivateMergeSimilarAccounts(accountsList:listWithSimilarAccount)
         XCTAssertEqual(mergedListWithSimilarAccount.count, 1,"Expected 1, received :\(mergedListWithSimilarAccount.count)")
 
     }
     /**turn ON your internet connection to perform this test**/
-    func testCompanyContactFetchContacts(){
+    func testDataRecordFetchContacts(){
         
         let e = expectation(description: "complationHandler handler invoked")
-        companyContactUnderTest.fetchContacts() { (reply) in
+        dataRecordUnderTest.fetchAccounts() { (reply) in
             
             switch reply{
             case .success(let data):
@@ -572,10 +636,10 @@ class ContactTests: XCTestCase {
     }
     
     /**turn OFF your internet connection to perform this test**/
-    func testCompanyContactFetchContactsWithNoInternet(){
+    func testDataRecordFetchContactsWithNoInternet(){
         
         let e = expectation(description: "complationHandler handler invoked")
-        companyContactUnderTest.fetchContacts() { (reply) in
+        dataRecordUnderTest.fetchAccounts() { (reply) in
             
             switch reply{
             case .success(let data):
@@ -586,6 +650,24 @@ class ContactTests: XCTestCase {
             e.fulfill()
         }
         waitForExpectations(timeout: 30.0, handler: nil)
+    }
+    
+    func testDataRecordRemoveAccount(){
+        
+        // first create account and add it into account list of
+        let accountId="removeAccountUnderTest"
+        let account=Account(accountId: accountId)
+        dataRecordUnderTest.appendAccount(account:account)
+        //1. test sussess case
+        let resultSussess=dataRecordUnderTest.removeAccount(account:account)
+        XCTAssert(try resultSussess.assertIsSuccess())
+        
+         //2. test failure case, try remove account that doesnot exsit
+        let noExistAccountId="noExistAccount"
+        let noExistaccount=Account(accountId: noExistAccountId)
+        let resultFailure=dataRecordUnderTest.removeAccount(account:noExistaccount)
+        XCTAssert(try resultFailure.assertIsFailure())
+
     }
 }
 
