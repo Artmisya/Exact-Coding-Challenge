@@ -59,7 +59,6 @@ class AccountListViewController: BaseViewController {
             case .success(let data):
                 
                 DispatchQueue.main.async {
-                    
                     self.refreshControl.endRefreshing()
                     self.accountList=data
                     self.accountsTableView.reloadData()
@@ -67,7 +66,13 @@ class AccountListViewController: BaseViewController {
                 }
             case .failure(let error):
                 print (error)
-                self.handleError(error: error)
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    self.refreshControl.endRefreshing()
+                    self.handleError(error: error)
+                    
+                }
+                
             }
         }
     }
