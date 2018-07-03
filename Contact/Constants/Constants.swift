@@ -47,7 +47,7 @@ struct Constants {
             static let accountCompulsoryFields:String="Please make sure all compulsory fields are filled in."
         }
         struct Keys{
-            static let KeyNames = ["businessEmail","businessPhone","businessMobile","email","firstName","middleName","lastName","fullName","gender","id","jobTitleDescription","mobile","phone","notes","pictureThumbnailUrl"]
+            static let KeyNames = ["businessPhone","businessMobile","businessEmail","email","firstName","middleName","lastName","fullName","gender","id","jobTitleDescription","mobile","phone","notes","pictureThumbnailUrl"]
             static let ImageType="pictureThumbnailUrl"
         }
     }
