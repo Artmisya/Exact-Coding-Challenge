@@ -10,5 +10,5 @@ import Foundation
 import UIKit
 
 protocol EditableLabelCellDelegate:class{
-    func textFieldDidEndEditing(cell: EditableLabelCell, value: String) -> ()
+    func textFieldDidEndEditing(cell: EditableLabelCell, userInput: String) -> ()
 }

@@ -29,7 +29,7 @@ class EditableLabelCell: UITableViewCell,UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        self.delegate?.textFieldDidEndEditing(cell: self, value: textField.text!)
+        self.delegate?.textFieldDidEndEditing(cell: self, userInput: textField.text!)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
