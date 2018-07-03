@@ -32,7 +32,8 @@ struct Constants {
     struct DataRecord {
         struct Message {
             static let deleteAccountFail="This account doesnot exsit"
-            static let deleteAccountSuccess="Removed Successfully!"
+            static let deleteAccountSuccess="Deleted Successfully!"
+            static let deleteAccountAlert="Delete this account?"
         }
     }
     struct Account {
