@@ -111,12 +111,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="enZ-e3-gTy">
-                                <rect key="frame" x="0.0" y="624" width="375" height="43"/>
+                                <rect key="frame" x="0.0" y="610" width="375" height="57"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xeJ-GW-iDi">
-                                        <rect key="frame" x="289" y="6.5" width="70" height="30"/>
+                                        <rect key="frame" x="289" y="8.5" width="70" height="40"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="h0f-Uu-yT7"/>
+                                            <constraint firstAttribute="height" constant="40" id="h0f-Uu-yT7"/>
                                             <constraint firstAttribute="width" constant="46" id="yPi-Di-3gM">
                                                 <variation key="heightClass=regular-widthClass=compact" constant="70"/>
                                             </constraint>
@@ -141,13 +141,12 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fxb-cB-kTG">
-                                        <rect key="frame" x="202" y="6.5" width="70" height="30"/>
+                                        <rect key="frame" x="202" y="8.5" width="70" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="46" id="ccI-t7-bKP">
                                                 <variation key="heightClass=regular-widthClass=compact" constant="70"/>
                                             </constraint>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="g7e-q6-y5E"/>
-                                            <constraint firstAttribute="height" constant="30" id="gxi-mT-F9S"/>
+                                            <constraint firstAttribute="height" constant="40" id="gxi-mT-F9S"/>
                                         </constraints>
                                         <state key="normal" title="Delete">
                                             <color key="titleColor" red="0.26379796859999999" green="0.26379007100000001" blue="0.2637945116" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -171,12 +170,11 @@
                                 </subviews>
                                 <color key="backgroundColor" red="0.91217948719999997" green="0.89377184249999997" blue="0.88896392089999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="43" id="CCO-qc-fx9"/>
+                                    <constraint firstAttribute="height" constant="57" id="CCO-qc-fx9"/>
                                     <constraint firstItem="xeJ-GW-iDi" firstAttribute="top" secondItem="fxb-cB-kTG" secondAttribute="top" id="FFM-Aa-hjH"/>
                                     <constraint firstItem="xeJ-GW-iDi" firstAttribute="leading" secondItem="fxb-cB-kTG" secondAttribute="trailing" constant="17" id="MvO-Zi-WRb"/>
                                     <constraint firstItem="xeJ-GW-iDi" firstAttribute="centerY" secondItem="enZ-e3-gTy" secondAttribute="centerY" id="ZhQ-gy-n0e"/>
                                     <constraint firstAttribute="trailing" secondItem="xeJ-GW-iDi" secondAttribute="trailing" constant="16" id="a2t-Qc-Rme"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="43" id="mn3-1e-hZf"/>
                                 </constraints>
                                 <variation key="default">
                                     <mask key="subviews">
@@ -200,7 +198,7 @@
                                 </variation>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="CQ3-iY-UOz">
-                                <rect key="frame" x="0.0" y="64" width="375" height="560"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="546"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </tableView>
                             <view hidden="YES" alpha="0.64999997615814209" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Htw-6S-hp4">

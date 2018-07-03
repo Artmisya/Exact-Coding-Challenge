@@ -122,7 +122,6 @@ class Account:Decodable {
     
     /* this fuction merge the current account with a similar account object.
     (two account objects consider similar if their accountId field have a same value)
-     note: that this function should not merge editable values
      */
     func merge(_ account:Account){
         
@@ -263,105 +262,105 @@ class Account:Decodable {
         }
     }
     
-    // this function check if a key doesnot have any value, add an user input value for that key, so later user can input data for that key
+    // this function check if a key doesnot have any value, add an userinput value for that key, so later user can input data for that key
     func addUserInputValues(){
         
         if  businessEmail.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            businessEmail.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            businessEmail.append(userInputValue)
         }
         if  businessPhone.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            businessPhone.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            businessPhone.append(userInputValue)
         }
         if  businessMobile.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            businessMobile.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            businessMobile.append(userInputValue)
         }
         if  email.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            email.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            email.append(userInputValue)
         }
         if  firstName.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            firstName.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            firstName.append(userInputValue)
         }
         if  fullName.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            fullName.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            fullName.append(userInputValue)
         }
         if  gender.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            gender.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            gender.append(userInputValue)
         }
         if  id.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            id.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            id.append(userInputValue)
         }
         if  jobTitleDescription.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            jobTitleDescription.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            jobTitleDescription.append(userInputValue)
         }
         if  lastName.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            lastName.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            lastName.append(userInputValue)
         }
         if  middleName.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            middleName.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            middleName.append(userInputValue)
         }
         if  mobile.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            mobile.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            mobile.append(userInputValue)
         }
         if  notes.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            notes.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            notes.append(userInputValue)
         }
         if  phone.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            phone.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            phone.append(userInputValue)
         }
         if  pictureThumbnailUrl.count==0{
             
-            let editableValue=Value(data: "")
-            editableValue.isUserInput=true
-            pictureThumbnailUrl.append(editableValue)
+            let userInputValue=Value(data: "")
+            userInputValue.isUserInput=true
+            pictureThumbnailUrl.append(userInputValue)
         }
         
     }
     func save() -> Result<Bool> {
         
-        if (self.isIncomplete()){
-            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.Account.Message.accountCompulsoryFields])
+        if let error=validateData(){
+     
             let result=Result<Bool>.failure(error)
             return result
         }
@@ -506,6 +505,29 @@ class Account:Decodable {
     }
     
  // MARK:- private functions
+    
+    private func validateData()->Error?{
+        
+        //validate compulsory fields:
+        if self.isIncomplete(){
+            
+            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.Account.Message.accountCompulsoryFields])
+            return error
+        }
+       // validate emails format:
+        if businessEmail.count>0 , businessEmail[0].data != "" , businessEmail[0].data.isValidEmail()==false{
+            
+            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.emailFormatError])
+            return error
+        }
+        if email.count>0 , email[0].data.isValidEmail()==false{
+            
+            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.emailFormatError])
+            return error
+        }
+        
+        return nil
+    }
     private func isArrayEmpty(_ inputArray:[Value])->Bool{
         
         if inputArray.contains(where:{($0.isUserInput==false && $0.selected == true ) || ($0.isUserInput==true && ($0.data != "" || $0.imageData != nil))}){

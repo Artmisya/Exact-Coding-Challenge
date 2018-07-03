@@ -8,40 +8,26 @@
 
 import Foundation
 
-
-
-
 class NetworkService{
     
     typealias networkServiceComplationHandler = (Result<Data>) -> Void
     
     private static var session: URLSession = URLSession(configuration:URLSessionConfiguration.default)
     
-//    init(){
-//
-//        let sessionConfiguration = URLSessionConfiguration.default
-//        self.session = URLSession(configuration: sessionConfiguration)
-//    }
-    
     class func request(url:URL,complationHandler: @escaping networkServiceComplationHandler){
         
         print ("->>request:",url.absoluteString)
         
         let dataTask=session.dataTask(with:url){ data, response, error in
-            
             guard error == nil else{
-                
                 // inform  model layer about the error
                 let result=Result<Data>.failure(error!)
                 complationHandler(result)
                 return
-                
             }
             //check response
             guard let httpResponse = response as? HTTPURLResponse else {
-                
                 let error = NSError(domain: Constants.DomainError.server, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
-                
                 // inform  model layer about the error
                 let result=Result<Data>.failure(error)
                 complationHandler(result)
@@ -56,10 +42,8 @@ class NetworkService{
                 let result=Result<Data>.failure(error)
                 complationHandler(result)
                 return
-                
             }
             guard let data = data else{
-                
                 let error = NSError(domain: Constants.DomainError.server, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.ErrorMessage.serverError])
                 // inform  model layer about the error
                 let result=Result<Data>.failure(error)
@@ -67,10 +51,10 @@ class NetworkService{
                 return
             }
             // data is received from api successfully
+            // inform  model layer about the data
             let result=Result.success(data)
             complationHandler(result)
         }
         dataTask.resume()
     }
-    
 }

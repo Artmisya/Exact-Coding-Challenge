@@ -45,8 +45,25 @@ final class DataRecord{
                 complationHandler(result)
             }
         }
- 
     }
+    
+    func removeAccount(account :Account)->Result<Bool>{
+        
+        if let index=accountsList.index(where: { $0.accountId == account.accountId }){
+            
+            accountsList.remove(at: index)
+            let result=Result.success(true)
+            return result
+        }
+        else{
+            
+            let error = NSError(domain: Constants.DomainError.account, code: 0, userInfo: [NSLocalizedDescriptionKey : Constants.DataRecord.Message.deleteAccountFail])
+            let result=Result<Bool>.failure(error)
+            return result
+        }
+    }
+    // MARK:- private functions:
+    
     private func createAccountsListFromData(data:Data)->Result<[Account]>{
             // first: decode Data into [Account]
         let decodeResult=self.decodeAccountsData(data:data)
@@ -64,7 +81,7 @@ final class DataRecord{
                 return result
             }
     }
-    
+
     private func mergeSimilarAccounts(accountsList:[Account])->[Account]{
         
         var mergedAccountList=[Account]()
@@ -84,8 +101,7 @@ final class DataRecord{
     }
 
     private func decodeAccountsData(data:Data)->Result<[Account]>{
-        
-        // convert Data to [String,Any]
+        //first convert Data to [String,Any] to get "d" and "results" keys
         var dataDic: [String: Any]
         do {
             dataDic = try JSONSerialization.jsonObject(with: data, options:.allowFragments) as! [String: Any]
@@ -112,7 +128,6 @@ final class DataRecord{
         do {
             let resultsData=try JSONSerialization.data(withJSONObject: results, options: JSONSerialization.WritingOptions.prettyPrinted) as NSData
             let decodedAccountsList=try jsonDecoder.decode([Account].self, from: resultsData as Data)
-            //print ("******",decodedContactsList.count)
             
             let result=Result.success(decodedAccountsList)
             return result
@@ -137,6 +152,11 @@ extension DataRecord {
     
     public func exposePrivateCreateAccountsListFromData(data:Data)->Result<[Account]>{
         return self.createAccountsListFromData(data:data)
+    }
+    
+    public func appendAccount(account:Account){
+        
+        self.accountsList.append(account)
     }
 }
 #endif

@@ -46,7 +46,7 @@ class AccountListViewController: BaseViewController {
         
         accountList=dataRecord.accountsList
         self.accountsTableView.reloadData()
-        // make searchText.observable to get called
+        // make searchText.observable to get called, this will need in caseuser delete or modify an account on a search results
         if searchBarView.text != "" {
             searchText.value = searchBarView.text
         }
@@ -201,8 +201,6 @@ class AccountListViewController: BaseViewController {
 extension AccountListViewController:UITableViewDataSource, UITableViewDelegate  {
  
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
-        print("accountsList.count=>>",self.accountList.count)
 
         return accountList.count
     }
