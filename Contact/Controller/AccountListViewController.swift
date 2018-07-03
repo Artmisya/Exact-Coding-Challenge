@@ -10,36 +10,60 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import SVProgressHUD
 class AccountListViewController: BaseViewController {
 
     @IBOutlet var searchBarView: UISearchBar!
     @IBOutlet var accountsTableView: UITableView!
+    @IBOutlet var alertLabel: UILabel!
+    @IBOutlet var alertView: UIView!
 
-    let companyAccount = CompanyContact.sharedInstance
+    let searchText = Variable<String?>(nil)
+     private let disposeBag = DisposeBag()
+    
+    let dataRecord = DataRecord.sharedInstance
     private var accountList=[Account]()
     private var refreshControl = UIRefreshControl()
 
-    private let disposeBag = DisposeBag()
+   
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupUpUi()
+        configureUI()
         configureTableView()
         configureRefreshControl()
         createSearchObserver()
         loadAccounts()
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        refreshData()
+    }
+    
+    private func refreshData(){
+        
+        accountList=dataRecord.accountsList
+        self.accountsTableView.reloadData()
+        // make searchText.observable to get called
+        if searchBarView.text != "" {
+            searchText.value = searchBarView.text
+        }
+    }
     private func loadAccounts(){
         
-        companyAccount.fetchAccounts(){ (result) in
+        SVProgressHUD.show(withStatus: "loading...")
+                dataRecord.fetchAccounts(){ (result) in
             switch result{
             case .success(let data):
                 
                 DispatchQueue.main.async {
+                    
                     self.refreshControl.endRefreshing()
                     self.accountList=data
                     self.accountsTableView.reloadData()
+                    SVProgressHUD.dismiss()
                 }
             case .failure(let error):
                 print (error)
@@ -50,21 +74,44 @@ class AccountListViewController: BaseViewController {
     
     private func createSearchObserver(){
         
-        searchBarView.rx.text.asObservable().subscribe(onNext: {
+        searchText.asObservable().subscribe(onNext: { [weak self] (text) in
+            if let welf = self, welf.searchBarView.text != text {
+                welf.searchBarView.text = text
+            }
+        }).disposed(by: disposeBag)
+        
+        searchText.asObservable().subscribe({[weak self] (text) in
+            
+            if let searchText=self?.searchText.value{
+                self?.accountList = (self?.accountList.filter({
+                    
+                    return $0.search(searchKeyword:searchText)
+                }))!
+                self?.accountsTableView.reloadData()
+            }
+        }).disposed(by: disposeBag)
+  
+        searchBarView.rx.text.asDriver()
+            .drive(searchText)
+            .disposed(by: disposeBag)
+        
+        searchBarView.rx.text.asObservable().subscribe(onNext: { [weak self]
             (searchText) in
-            // if search text is empty no need search just refresh
+            // if search text is empty no need search just reset the datasource
             if (searchText?.isEmpty)! {
-                self.accountList=self.companyAccount.accountsList
-                self.accountsTableView.reloadData()
+                //reset datasource
+                self?.accountList=(self?.dataRecord.accountsList)!
+                self?.accountsTableView.reloadData()
                 return
             }
             // go for search
-            self.accountList = self.accountList.filter({
+            self?.accountList = (self?.accountList.filter({
                 
-                return $0.search(searchKeyword: (searchText?.lowercased())!)
-            })
-            self.accountsTableView.reloadData()
+                return $0.search(searchKeyword:searchText!)
+            }))!
+            self?.accountsTableView.reloadData()
         }).disposed(by: disposeBag)
+    
     }
     
    private func configureTableView() {
@@ -79,13 +126,13 @@ class AccountListViewController: BaseViewController {
         accountsTableView.estimatedRowHeight = 200.0
     }
     
-    private func setupUpUi(){
+    private func configureUI(){
         
         self.title="Account Records"
         
         view.isUserInteractionEnabled=true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(recognizer:)))
-        view.addGestureRecognizer(tapGesture)
+//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(recognizer:)))
+//        view.addGestureRecognizer(tapGesture)
     }
     
     private func configureRefreshControl(){
@@ -93,7 +140,43 @@ class AccountListViewController: BaseViewController {
         refreshControl.addTarget(self, action: #selector(self.didPullToRefresh), for: .valueChanged)
         accountsTableView.addSubview(refreshControl)
         searchBarView.delegate=self
-   
+    }
+    
+    func confirmRemoveAccount(account:Account){
+        
+        let alert = UIAlertController(title: "", message: Constants.DataRecord.Message.deleteAccountAlert, preferredStyle: UIAlertControllerStyle.alert)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action: UIAlertAction!) in
+            self.removeAccount(account:account)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action: UIAlertAction!) in
+            
+            return
+        }))
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func removeAccount(account:Account){
+        
+        let result=dataRecord.removeAccount(account:account)
+        
+        switch result {
+        case .success(_):
+            
+            refreshData()
+            alertLabel.text=Constants.DataRecord.Message.deleteAccountSuccess
+            alertView.isHidden = false
+            let when = DispatchTime.now() + 1.0
+            DispatchQueue.main.asyncAfter(deadline: when) {
+                self.alertView.isHidden = true
+                
+            }
+        case .failure(let error):
+            print (error)
+            self.handleError(error: error)
+        }
     }
     
     // dismiss keyboard when user tab on the view
@@ -109,6 +192,8 @@ class AccountListViewController: BaseViewController {
         searchBarView.text=""
         loadAccounts()
     }
+    
+    
 }
 
 //****** MARK: tableview delegates
@@ -151,6 +236,28 @@ extension AccountListViewController:UITableViewDataSource, UITableViewDelegate  
         cell.selectionStyle = UITableViewCellSelectionStyle.default
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        self.searchBarView.endEditing(true)
+        let selectedAccount = self.accountList[indexPath.row]
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "AccountDetailVC") as! AccountDetailViewController
+        
+        vc.account = selectedAccount
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView,trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration?{
+        
+        let deleteAction = UIContextualAction(style: .normal, title:  "Delete", handler: { (ac:UIContextualAction, view:UIView, success:(Bool) -> Void) in
+            let account=self.accountList[indexPath.row]
+            self.confirmRemoveAccount(account: account)
+            success(true)
+        })
+        deleteAction.backgroundColor = UIColor.red
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
 }
 
